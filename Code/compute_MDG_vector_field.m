@@ -1,5 +1,5 @@
-%function [mag_MDG_field, MDG_field_dir, sources_ind, I_v_bar, signed_MDG_feature_field, mag_signed_MDG_field] = compute_MDG_vector_field(img)
-img = mr_t1_img_001;
+function [MDG_field_dir, sources_ind, I_v_bar, signed_MDG_feature_field, mag_signed_MDG_field] = compute_MDG_vector_field(img)
+
 I_source = img;
 [X Y Z] = size(img);
 
@@ -54,4 +54,4 @@ y_dir_grad = reshape(signed_MDG_feature_field(X*Y*(img_centre(3)-1)+1:(img_centr
 figure
 quiver(1:X,1:Y, x_dir_grad, y_dir_grad);
 
-%end
+end
