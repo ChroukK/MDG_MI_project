@@ -1,5 +1,5 @@
 %function [mag_MDG_field, MDG_field_dir, sources_ind, I_v_bar, signed_MDG_feature_field, mag_signed_MDG_field] = compute_MDG_vector_field(img)
-img = subsampled_2_mr_t1_001_img;
+img = mr_t1_img_001;
 I_source = img;
 [X Y Z] = size(img);
 
