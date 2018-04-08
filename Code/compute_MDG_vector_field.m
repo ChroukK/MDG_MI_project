@@ -1,8 +1,8 @@
-function [MDG_field_dir, sources_ind, I_v_bar, signed_MDG_feature_field, mag_signed_MDG_field] = compute_MDG_vector_field(img)
+function [signed_MDG_field, mag_signed_MDG_field] = compute_MDG_vector_field(img)
 
 I_source = img;
 [X Y Z] = size(img);
-
+tic
 dist_matrix = []; 
 sources_ind = [];
 
@@ -13,7 +13,7 @@ for v_z_dist=1:Z
         end
     end
 end
-fprintf('Generated the distance Matrix\n');
+%fprintf('Generated the distance Matrix\n');
 
 for v_z=1:Z
     for v_y=1:Y
@@ -34,7 +34,7 @@ for v_z=1:Z
             sources_ind = [sources_ind ;[x_src, y_src, z_src]];
         end
     end
-    fprintf('Finished slice=%d\n', v_z);
+    %fprintf('Finished slice=%d\n', v_z);
 end
 
 
@@ -45,13 +45,13 @@ MDG_field_dir = dist_direction ./ repmat(direction_mag,1, 3); % norm
 abs_mag_signed_MDG_field = abs(I_v_bar - img)./ dist_denom; % |I_v_bar - I_v|/|v' -v|
 
 mag_signed_MDG_field = sign(I_v_bar - img).*abs_mag_signed_MDG_field; 
-signed_MDG_feature_field =  MDG_field_dir .* repmat(mag_signed_MDG_field(:), 1, 3);
-
-img_centre = round(size(img)/2);
-x_dir_grad = reshape(signed_MDG_feature_field(X*Y*(img_centre(3)-1)+1:(img_centre(3)*X*Y),1), X, Y);
-y_dir_grad = reshape(signed_MDG_feature_field(X*Y*(img_centre(3)-1)+1:(img_centre(3)*X*Y),2), X, Y);
-
-figure
-quiver(1:X,1:Y, x_dir_grad, y_dir_grad);
-
+signed_MDG_field =  MDG_field_dir .* repmat(mag_signed_MDG_field(:), 1, 3);
+% 
+% img_centre = round(size(img)/2);
+% x_dir_grad = reshape(signed_MDG_field(X*Y*(img_centre(3)-1)+1:(img_centre(3)*X*Y),1), X, Y);
+% y_dir_grad = reshape(signed_MDG_field(X*Y*(img_centre(3)-1)+1:(img_centre(3)*X*Y),2), X, Y);
+% 
+% figure
+% quiver(1:X,1:Y, x_dir_grad, y_dir_grad);
+time_taken = toc
 end
