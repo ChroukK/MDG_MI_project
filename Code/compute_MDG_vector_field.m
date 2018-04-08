@@ -2,7 +2,7 @@ function [signed_MDG_field, mag_signed_MDG_field] = compute_MDG_vector_field(img
 
 I_source = img;
 [X Y Z] = size(img);
-tic
+%tic
 dist_matrix = []; 
 sources_ind = [];
 
@@ -53,5 +53,5 @@ signed_MDG_field =  MDG_field_dir .* repmat(mag_signed_MDG_field(:), 1, 3);
 % 
 % figure
 % quiver(1:X,1:Y, x_dir_grad, y_dir_grad);
-time_taken = toc
+%time_taken = toc
 end
