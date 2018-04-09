@@ -41,7 +41,7 @@ perturbed_mr_t1_img_001 = imrotate3(perturbed_mr_t1_img_001, 4, [0 1 0], 'crop',
 perturbed_mr_t1_img_001 = imrotate3(perturbed_mr_t1_img_001, -8, [0 0 1], 'crop', 'FillValues', mode(prealigned_mr_t1_img_001(:)));
 perturbed_z_disp_matrix = zeros(512, 512, 28, 3); 
 perturbed_z_disp_matrix(:,:,:,3) = 2; 
-translated_f_img = imwarp(prealigned_mr_t1_img_001, perturbed_z_disp_matrix, 'linear', 'FillValues', mode(prealigned_mr_t1_img_001(:)));
+translated_f_img = imwarp(perturbed_mr_t1_img_001, perturbed_z_disp_matrix, 'linear', 'FillValues', mode(perturbed_mr_t1_img_001(:)));
 figure
 imshow3D(perturbed_mr_t1_img_001); 
 
