@@ -1,5 +1,5 @@
 
-perturbed_mr_t1_img_001 = imtranslate(prealigned_mr_t1_img_001, [64 -80], 'FillValues', mode(prealigned_mr_t1_img_001(:)));
+perturbed_mr_t1_img_001 = imtranslate(prealigned_mr_t1_img_001, [-40 90], 'FillValues', mode(prealigned_mr_t1_img_001(:)));
 perturbed_mr_t1_img_001 = imrotate3(perturbed_mr_t1_img_001, 15, [1 0 0], 'crop', 'FillValues', mode(low_res_f_img(:)));
 perturbed_mr_t1_img_001 = imrotate3(perturbed_mr_t1_img_001, 5, [0 1 0], 'crop', 'FillValues', mode(low_res_f_img(:)));
 perturbed_mr_t1_img_001 = imrotate3(perturbed_mr_t1_img_001, -18, [0 0 1], 'crop', 'FillValues', mode(low_res_f_img(:)));
@@ -9,8 +9,8 @@ translated_f_img = imwarp(low_res_f_img, perturbed_z_disp_matrix, 'linear', 'Fil
 figure
 imshow3D(perturbed_mr_t1_img_001); 
 
-r_img = perturbed_mr_t1_img_001(:,:,1:2:28); 
-f_img = ct_img_001(:,:,1:2:28);
+r_img = perturbed_mr_t1_img_001(:,:,1:2:26); 
+f_img = ct_img_001(:,:,1:2:26);
 levels = 4; 
 
 r_x_region = 15; 
@@ -58,10 +58,10 @@ for l=2:levels
         MI_r_x_trans = [MI_r_x_trans mi(rotated_f_img, low_res_r_img)]; 
         fprintf('Rotations on x-axis: %d at level :%d\n', r_x, l);
     end
-    r_x_trans_region = [r_x_trans_region round((S_r_x_trans_max_I+r_x_trans_region(l) -1)+(r_x_trans_region(2)/2^(l-1)))];    
+    r_x_trans_region = [r_x_trans_region round((S_r_x_trans_max_I+r_x_trans_region(l) -1))+(r_x_trans_region(2)/2^(l-1)))];    
     S_r_x_tran = MI4d_r_x_trans.*D_of_T_r_x_trans;
     r_x_trans_fig = figure
-    plot(round((S_r_x_trans_max_I+r_x_trans_region(l) -1)+(r_x_trans_region(2)/2^(l-1))):round((S_r_x_trans_max_I+r_x_trans_region(l) -1)-(r_x_trans_region(2)/2^(l-1))), S_r_x_tran);
+    plot(round((S_r_x_trans_max_I+r_x_trans_region(l) -1)*2^(l-1)+(r_x_trans_region(2)/2^(l-1))):round((S_r_x_trans_max_I+r_x_trans_region(l) -1)*2^(l-1)-(r_x_trans_region(2)/2^(l-1))), S_r_x_tran);
     title(['Level ' num2str(l) ' for x-axis rotations'])
     savefig(r_x_trans_fig, [pwd '/registration/level_' num2str(l) '_regis_x_rot']);
     [S_x_tran_max S_r_x_trans_max_I] = max(S_r_x_tran);
@@ -72,7 +72,7 @@ for l=2:levels
     D_of_T_r_y_trans = [];
     MI_r_y_trans = []; 
     S_r_y_tran = [];
-    for r_y = round((S_r_y_trans_max_I+r_y_trans_region(l) -1)+(r_y_trans_region(2)/2^(l-1))):round((S_r_y_trans_max_I+r_y_trans_region(l) -1)-(r_y_trans_region(2)/2^(l-1)))
+    for r_y = round((S_r_y_trans_max_I+r_y_trans_region(l) -1)*2^(l-1)+(r_y_trans_region(2)/2^(l-1))):round((S_r_y_trans_max_I+r_y_trans_region(l) -1)*2^(l-1)-(r_y_trans_region(2)/2^(l-1)))
         rotated_f_img = imrotate3(low_res_f_img, r_y, [0 1 0], 'crop', 'FillValues', mode(low_res_f_img(:)));
         [f_img_signed_MDG_field f_img_mag_signed_MDG_field] = compute_MDG_vector_field(rotated_f_img);
         MI4d_r_y_trans = [MI4d_r_y_trans compute_4D_MI(rotated_f_img, f_img_mag_signed_MDG_field, low_res_r_img, r_img_mag_signed_MDG_field, 32)]; 
@@ -80,10 +80,10 @@ for l=2:levels
         MI_r_y_trans = [MI_r_y_trans mi(rotated_f_img, low_res_r_img)]; 
         fprintf('Rotations on y-axis: %d at level :%d\n', r_y, l);
     end
-    r_y_trans_region = [r_y_trans_region round((S_r_y_trans_max_I+r_y_trans_region(l) -1)+(r_y_trans_region(2)/2^(l-1)))];    
+    r_y_trans_region = [r_y_trans_region round((S_r_y_trans_max_I+r_y_trans_region(l) -1)*2^(l-1)+(r_y_trans_region(2)/2^(l-1)))];    
     S_r_y_tran = MI4d_r_y_trans.*D_of_T_r_y_trans;
     r_y_trans_fig = figure
-    plot(round((S_r_y_trans_max_I+r_y_trans_region(l) -1)+(r_y_trans_region(2)/2^(l-1))):round((S_r_y_trans_max_I+r_y_trans_region(l) -1)-(r_y_trans_region(2)/2^(l-1))), S_r_y_tran);
+    plot(round((S_r_y_trans_max_I+r_y_trans_region(l) -1)*2^(l-1)+(r_y_trans_region(2)/2^(l-1))):round((S_r_y_trans_max_I+r_y_trans_region(l) -1)*2^(l-1)-(r_y_trans_region(2)/2^(l-1))), S_r_y_tran);
     title(['Level ' num2str(l) ' for y-axis rotations'])
     savefig(r_y_trans_fig, [pwd '/registration/level_' num2str(l) '_regis_y_rot']);
     [S_x_rot_max S_r_y_trans_max_I] = max(S_r_y_tran);
@@ -95,7 +95,7 @@ for l=2:levels
     D_of_T_r_z_trans = [];
     MI_r_z_trans = []; 
     S_r_z_tran = [];
-    for r_z = round((S_r_z_trans_max_I+r_z_trans_region(l) -1)+(r_z_trans_region(2)/2^(l-1))):round((S_r_z_trans_max_I+r_z_trans_region(l) -1)-(r_z_trans_region(2)/2^(l-1)))
+    for r_z = round((S_r_z_trans_max_I+r_z_trans_region(l) -1)*2^(l-1)+(r_z_trans_region(2)/2^(l-1))):round((S_r_z_trans_max_I+r_z_trans_region(l) -1)*2^(l-1)-(r_z_trans_region(2)/2^(l-1)))
         rotated_f_img = imrotate3(low_res_f_img, r_z, [0 1 0], 'crop', 'FillValues', mode(low_res_f_img(:)));
         [f_img_signed_MDG_field f_img_mag_signed_MDG_field] = compute_MDG_vector_field(rotated_f_img);
         MI4d_r_z_trans = [MI4d_r_z_trans compute_4D_MI(rotated_f_img, f_img_mag_signed_MDG_field, low_res_r_img, r_img_mag_signed_MDG_field, 32)]; 
@@ -103,10 +103,10 @@ for l=2:levels
         MI_r_z_trans = [MI_r_z_trans mi(rotated_f_img, low_res_r_img)]; 
         fprintf('Rotations on z-axis: %d at level :%d\n', r_z, l);
     end
-    r_z_trans_region = [r_z_trans_region round((S_r_z_trans_max_I+r_z_trans_region(l) -1)+(r_z_trans_region(2)/2^(l-1)))];    
+    r_z_trans_region = [r_z_trans_region round((S_r_z_trans_max_I+r_z_trans_region(l) -1)*2^(l-1)+(r_z_trans_region(2)/2^(l-1)))];    
     S_r_z_tran = MI4d_r_z_trans.*D_of_T_r_z_trans;
     r_z_trans_fig = figure
-    plot(round((S_r_z_trans_max_I+r_z_trans_region(l) -1)+(r_z_trans_region(2)/2^(l-1))):round((S_r_z_trans_max_I+r_z_trans_region(l) -1)-(r_z_trans_region(2)/2^(l-1))), S_r_z_tran);
+    plot(round((S_r_z_trans_max_I+r_z_trans_region(l) -1)*2^(l-1)+(r_z_trans_region(2)/2^(l-1))):round((S_r_z_trans_max_I+r_z_trans_region(l) -1)*2^(l-1)-(r_z_trans_region(2)/2^(l-1))), S_r_z_tran);
     title(['Level ' num2str(l) ' for z-axis rotations'])
     savefig(r_z_trans_fig, [pwd '/registration/level_' num2str(l) '_regis_z_rot']);
     [S_z_rot_max S_r_z_trans_max_I] = max(S_r_z_tran);

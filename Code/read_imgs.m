@@ -36,8 +36,8 @@ mr_t1_img_001_ref = imref3d(size(mr_t1_img_001),mr_t1_img_001_header.PixelSize(2
 %figure
 %imshow3D(ct_img_001);
 ct_img_001_centre = round(size(ct_img_001)/2);
-%figure
-%imshowpair(ct_img_001(:,:,ct_img_001_centre(3)), mr_t1_img_001(:,:,mr_t1_001_centre(3)));
+figure
+imshowpair(ct_img_001(:,:,ct_img_001_centre(3)), mr_t1_img_001(:,:,mr_t1_001_centre(3)));
 
 [optimizer,metric] = imregconfig('multimodal');
 optimizer.InitialRadius = 0.004;
