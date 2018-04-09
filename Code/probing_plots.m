@@ -1,77 +1,77 @@
 %% Patient 001 Images
-mr_t1_img_001_header  = helperReadHeaderRIRE('header_rectified_mr_t1_001.ascii');
-mr_t1_img_001  = multibandread('image_mr_t1_001_rectified.bin',...
-                            [mr_t1_img_001_header.Rows, mr_t1_img_001_header.Columns, mr_t1_img_001_header.Slices],...
-                            'int16=>single', 0, 'bsq', 'ieee-be' );
-%figure
-%imshow3D(mr_t1_img_001);
-mr_t1_001_centre= round(size(mr_t1_img_001)/2);
-
-ct_img_001_header  = helperReadHeaderRIRE('header_ct_001.ascii');
-ct_img_001  = multibandread('image_ct_001.bin',...
-                            [ct_img_001_header.Rows, ct_img_001_header.Columns, ct_img_001_header.Slices],...
-                            'int16=>single', 0, 'bsq', 'ieee-be' );
-ct_img_001_ref  = imref3d(size(ct_img_001),ct_img_001_header.PixelSize(2),ct_img_001_header.PixelSize(1),ct_img_001_header.SliceThickness);
-mr_t1_img_001_ref = imref3d(size(mr_t1_img_001),mr_t1_img_001_header.PixelSize(2),mr_t1_img_001_header.PixelSize(1),mr_t1_img_001_header.SliceThickness);
-%figure
-%imshow3D(ct_img_001);
-ct_img_001_centre = round(size(ct_img_001)/2);
-%figure
-%imshowpair(ct_img_001(:,:,ct_img_001_centre(3)), mr_t1_img_001(:,:,mr_t1_001_centre(3)));
-
-[optimizer,metric] = imregconfig('multimodal');
-optimizer.InitialRadius = 0.004;
-
-prealigned_ct_img_001 = imregister(ct_img_001,ct_img_001_changed, mr_t1_img_001, mr_t1_img_001_changed, 'rigid', optimizer, metric);
-prealigned_mr_t1_img_001 = imregister(mr_t1_img_001, mr_t1_img_001_ref, ct_img_001,ct_img_001_ref,'rigid', optimizer, metric);
-%geomtform = imregtform(mr_t1_img_001, mr_t1_img_001_ref, ct_img_001,ct_img_001_ref, 'rigid', optimizer, metric);
-% figure
-% imshowpair(ct_img_001(:,:,mr_t1_001_centre(3)), prealigned_mr_t1_img_001(:,:,mr_t1_001_centre(3)));
-% figure
-% imshow3D(prealigned_mr_t1_img_001); 
+% mr_t1_img_001_header  = helperReadHeaderRIRE('header_rectified_mr_t1_001.ascii');
+% mr_t1_img_001  = multibandread('image_mr_t1_001_rectified.bin',...
+%                             [mr_t1_img_001_header.Rows, mr_t1_img_001_header.Columns, mr_t1_img_001_header.Slices],...
+%                             'int16=>single', 0, 'bsq', 'ieee-be' );
+% %figure
+% %imshow3D(mr_t1_img_001);
+% mr_t1_001_centre= round(size(mr_t1_img_001)/2);
 % 
-% figure
-% imshowpair(prealigned_ct_img_001(:,:,ct_img_001_centre(3)), mr_t1_img_001(:,:,ct_img_001_centre(3)));
-% figure
-% imshow3D(prealigned_ct_img_001); 
-%% 4 Levels of Lower Resolution Gaussain Pyramid 
-tic
-
-r_img_lv_0 = prealigned_mr_t1_img_001(:,:,1:2:26);%512
-r_img_lv_1 = impyramid(r_img_lv_0, 'reduce'); %256 
-r_img_lv_2 = impyramid(r_img_lv_1, 'reduce'); %128
-r_img_lv_3 = impyramid(r_img_lv_2, 'reduce'); %64
-r_img_lv_4 = impyramid(r_img_lv_3, 'reduce'); %32
-
-%floating image
-f_img_lv_0 =  ct_img_001(:,:,1:2:26); %512
-f_img_lv_1 = impyramid(f_img_lv_0, 'reduce'); %256 
-f_img_lv_2 = impyramid(f_img_lv_1, 'reduce'); %128
-f_img_lv_3 = impyramid(f_img_lv_2, 'reduce'); %64
-f_img_lv_4 = impyramid(f_img_lv_3, 'reduce'); %32
-
-r_img = r_img_lv_3; 
-f_img = f_img_lv_3;
-bins = 16; 
-[r_img_signed_MDG_field r_img_mag_signed_MDG_field] = compute_MDG_vector_field(r_img);
-%% Translation in x-axis
-MI4d_x_trans = [];
-MI_x_trans = []; 
-D_of_T_x_trans = []; 
-S_x_trans = [];
-x_min = -60;
-x_max = 60;
-for x=x_min:x_max
-    translated_f_img = imtranslate(f_img, [x 0], 'FillValues', mode(f_img(:)));
-    [f_img_signed_MDG_field f_img_mag_signed_MDG_field] = compute_MDG_vector_field(translated_f_img);
-    MI4d_x_trans = [MI4d_x_trans compute_4D_MI(translated_f_img, f_img_mag_signed_MDG_field, r_img, r_img_mag_signed_MDG_field, bins)]; 
-    D_of_T_x_trans = [D_of_T_x_trans compute_angle_measure_D(r_img_signed_MDG_field, f_img_signed_MDG_field, r_img_mag_signed_MDG_field, f_img_mag_signed_MDG_field)]; 
-    MI_x_trans = [MI_x_trans mi(translated_f_img, r_img)]; 
-    fprintf('translation x: %d\n', x);
-end
-fprintf('Finished x translations\n'); 
-S_x_trans = MI4d_x_trans.*D_of_T_x_trans;
-save('\output\probing_plots_workspace'); 
+% ct_img_001_header  = helperReadHeaderRIRE('header_ct_001.ascii');
+% ct_img_001  = multibandread('image_ct_001.bin',...
+%                             [ct_img_001_header.Rows, ct_img_001_header.Columns, ct_img_001_header.Slices],...
+%                             'int16=>single', 0, 'bsq', 'ieee-be' );
+% ct_img_001_ref  = imref3d(size(ct_img_001),ct_img_001_header.PixelSize(2),ct_img_001_header.PixelSize(1),ct_img_001_header.SliceThickness);
+% mr_t1_img_001_ref = imref3d(size(mr_t1_img_001),mr_t1_img_001_header.PixelSize(2),mr_t1_img_001_header.PixelSize(1),mr_t1_img_001_header.SliceThickness);
+% %figure
+% %imshow3D(ct_img_001);
+% ct_img_001_centre = round(size(ct_img_001)/2);
+% %figure
+% %imshowpair(ct_img_001(:,:,ct_img_001_centre(3)), mr_t1_img_001(:,:,mr_t1_001_centre(3)));
+% 
+% [optimizer,metric] = imregconfig('multimodal');
+% optimizer.InitialRadius = 0.004;
+% 
+% prealigned_ct_img_001 = imregister(ct_img_001,ct_img_001_ref, mr_t1_img_001, mr_t1_img_001_ref, 'rigid', optimizer, metric);
+% prealigned_mr_t1_img_001 = imregister(mr_t1_img_001, mr_t1_img_001_ref, ct_img_001,ct_img_001_ref,'rigid', optimizer, metric);
+% %geomtform = imregtform(mr_t1_img_001, mr_t1_img_001_ref, ct_img_001,ct_img_001_ref, 'rigid', optimizer, metric);
+% % figure
+% % imshowpair(ct_img_001(:,:,mr_t1_001_centre(3)), prealigned_mr_t1_img_001(:,:,mr_t1_001_centre(3)));
+% % figure
+% % imshow3D(prealigned_mr_t1_img_001); 
+% % 
+% % figure
+% % imshowpair(prealigned_ct_img_001(:,:,ct_img_001_centre(3)), mr_t1_img_001(:,:,ct_img_001_centre(3)));
+% % figure
+% % imshow3D(prealigned_ct_img_001); 
+% %% 4 Levels of Lower Resolution Gaussain Pyramid 
+% tic
+% 
+% r_img_lv_0 = prealigned_mr_t1_img_001(:,:,1:2:26);%512
+% r_img_lv_1 = impyramid(r_img_lv_0, 'reduce'); %256 
+% r_img_lv_2 = impyramid(r_img_lv_1, 'reduce'); %128
+% r_img_lv_3 = impyramid(r_img_lv_2, 'reduce'); %64
+% r_img_lv_4 = impyramid(r_img_lv_3, 'reduce'); %32
+% 
+% %floating image
+% f_img_lv_0 =  ct_img_001(:,:,1:2:26); %512
+% f_img_lv_1 = impyramid(f_img_lv_0, 'reduce'); %256 
+% f_img_lv_2 = impyramid(f_img_lv_1, 'reduce'); %128
+% f_img_lv_3 = impyramid(f_img_lv_2, 'reduce'); %64
+% f_img_lv_4 = impyramid(f_img_lv_3, 'reduce'); %32
+% 
+% r_img = r_img_lv_3; 
+% f_img = f_img_lv_3;
+% bins = 16; 
+% [r_img_signed_MDG_field r_img_mag_signed_MDG_field] = compute_MDG_vector_field(r_img);
+% %% Translation in x-axis
+% MI4d_x_trans = [];
+% MI_x_trans = []; 
+% D_of_T_x_trans = []; 
+% S_x_trans = [];
+% x_min = -60;
+% x_max = 60;
+% for x=x_min:x_max
+%     translated_f_img = imtranslate(f_img, [x 0], 'FillValues', mode(f_img(:)));
+%     [f_img_signed_MDG_field f_img_mag_signed_MDG_field] = compute_MDG_vector_field(translated_f_img);
+%     MI4d_x_trans = [MI4d_x_trans compute_4D_MI(translated_f_img, f_img_mag_signed_MDG_field, r_img, r_img_mag_signed_MDG_field, bins)]; 
+%     D_of_T_x_trans = [D_of_T_x_trans compute_angle_measure_D(r_img_signed_MDG_field, f_img_signed_MDG_field, r_img_mag_signed_MDG_field, f_img_mag_signed_MDG_field)]; 
+%     MI_x_trans = [MI_x_trans mi(translated_f_img, r_img)]; 
+%     fprintf('translation x: %d\n', x);
+% end
+% fprintf('Finished x translations\n'); 
+% S_x_trans = MI4d_x_trans.*D_of_T_x_trans;
+save([pwd '\output\probing_plots_workspace']);
 figure
 plot(x_min:x_max,S_x_trans)
 title("MI4D*cos Similarity Measure for x translations"); 
@@ -98,7 +98,7 @@ for y=y_min:y_max
 end
 fprintf('Finished y translations\n'); 
 S_y_trans = MI4d_y_trans.*D_of_T_y_trans;
-save('\output\probing_plots_workspace'); 
+save([pwd '\output\probing_plots_workspace']);
 figure
 plot(y_min:y_max,S_y_trans)
 title("MI4D*cos Similarity Measure for y translations"); 
@@ -129,7 +129,7 @@ for z=z_min:z_max
 end
 fprintf('Finished z translations\n'); 
 S_z_trans = MI4d_z_trans.*D_of_T_z_trans;
-save('\output\probing_plots_workspace'); 
+save([pwd '\output\probing_plots_workspace']);
 figure
 plot(z_min:z_max,S_z_trans)
 title("MI4D*cos Similarity Measure for z translations"); 
@@ -158,7 +158,7 @@ for r_x=r_x_min:r_x_max
 end
 fprintf('Finished x-axis rotations\n'); 
 S_x_rot = MI4d_x_rot.*D_of_T_x_rot;
-save('\output\probing_plots_workspace'); 
+save([pwd '\output\probing_plots_workspace']);
 figure
 plot(r_x_min:r_x_max,S_x_rot)
 title("MI4D*cos Similarity Measure for x-axis rotations"); 
@@ -186,7 +186,7 @@ for r_y=r_y_min:r_y_max
 end
 fprintf('Finished y-axis rotations\n'); 
 S_y_rot = MI4d_y_rot.*D_of_T_y_rot;
-save('\output\probing_plots_workspace'); 
+save([pwd '\output\probing_plots_workspace']);
 figure
 plot(r_y_min:r_y_max,S_y_rot)
 title("MI4D*cos Similarity Measure for y-axis rotations"); 
@@ -214,7 +214,7 @@ for r_z=r_z_min:r_y_max
 end
 fprintf('Finished z-axis rotations\n'); 
 S_z_rot = MI4d_z_rot.*D_of_T_z_rot;
-save('\output\probing_plots_workspace'); 
+save([pwd '\output\probing_plots_workspace']);
 figure
 plot(r_z_min:r_y_max,S_z_rot)
 title("MI4D*cos Similarity Measure for z-axis rotations"); 
